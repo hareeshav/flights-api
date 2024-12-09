@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+
+  flights-api:
+    build:
+      context: .
+      args:
+        - ARCH=linux/amd64
+    container_name: flights-api
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
