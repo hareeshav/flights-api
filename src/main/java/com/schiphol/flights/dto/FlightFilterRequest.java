@@ -5,9 +5,6 @@ import com.schiphol.flights.model.FlightDirection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.time.LocalDateTime;
 
 @Data
 public class FlightFilterRequest {
@@ -20,11 +17,11 @@ public class FlightFilterRequest {
 
     @Schema(description = "Start schedule date/time range filter", example = "2023-12-01T00:00:00")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime startScheduleDateTime;
+    private String startScheduleDateTime;
 
     @Schema(description = "End schedule date/time range filter", example = "2023-12-31T23:59:59")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime endScheduleDateTime;
+    private String endScheduleDateTime;
 
     @Schema(description = "Flight direction filter", example = "DEPARTURE")
     private FlightDirection flightDirection;

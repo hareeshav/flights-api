@@ -1,5 +1,6 @@
 package com.schiphol.flights;
 
+import com.schiphol.flights.config.ElasticSearchConfig;
 import com.schiphol.flights.model.Flight;
 import com.schiphol.flights.model.FlightDirection;
 import com.schiphol.flights.model.FlightStatus;
@@ -7,6 +8,7 @@ import com.schiphol.flights.repository.FlightRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -14,12 +16,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Testcontainers
+@Import(ElasticSearchConfig.class)
 public class FlightIntegrationTest {
 
     @Autowired
@@ -32,12 +34,12 @@ public class FlightIntegrationTest {
                     .withEnv("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
                     .withEnv("discovery.type", "single-node")
                     .withEnv("xpack.security.enabled", "false")
-                    .waitingFor(Wait.forHttp("/").forPort(9200).withStartupTimeout(Duration.ofMinutes(2)));
+                    .waitingFor(Wait.forHttp("/").forPort(9200).withStartupTimeout(Duration.ofMinutes(1)));
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
         // Dynamically inject the container's HTTP endpoint into Spring Boot's properties
-        registry.add("spring.elasticsearch.uris", () -> "http://localhost:" + elasticsearchContainer.getMappedPort(9200));
+        registry.add("spring.elasticsearch.rest.uris", () -> "http://localhost:" + elasticsearchContainer.getMappedPort(9200));
     }
 
     @Test
