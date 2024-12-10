@@ -27,7 +27,7 @@ public class FlightController {
 
         PaginatedResponse<Flight> flights = flightService.searchFlights(
                 flightFilterRequest.getDestination(),
-                flightFilterRequest.getStartScheduleDateTime() != null ? flightFilterRequest.getStartScheduleDateTime() : LocalDateTime.parse("1970-01-01T00:00:00"),
+                flightFilterRequest.getStartScheduleDateTime() != null ? flightFilterRequest.getStartScheduleDateTime() : LocalDateTime.parse("1970-01-01T00:00:01"),
                 flightFilterRequest.getEndScheduleDateTime() != null ? flightFilterRequest.getEndScheduleDateTime() : LocalDateTime.parse("9999-12-31T23:59:59"),
                 flightFilterRequest.getFlightDirection() != null ? flightFilterRequest.getFlightDirection() : FlightDirection.ARRIVAL,
                 flightFilterRequest.getMinDelayInMinutes(), flightFilterRequest.getPage(), flightFilterRequest.getPageSize()

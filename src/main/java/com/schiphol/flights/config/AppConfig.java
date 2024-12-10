@@ -23,11 +23,11 @@ public class AppConfig {
                                 "FL" + i,
                                 "EK" + (i % 10),
                                 "ORI" + (i % 5),
-                                "DST" + (i % 7),
-                                LocalDateTime.now().plusHours(i % 24),
-                                FlightDirection.values()[i % FlightDirection.values().length],
-                                FlightStatus.values()[i % FlightStatus.values().length],
-                                i % 60
+                                "AMS",
+                                System.currentTimeMillis(),
+                                FlightDirection.ARRIVAL,
+                                FlightStatus.SCHEDULED,
+                                2,""
                         )
                 ).toList();
                 flightRepository.saveAll(flights);

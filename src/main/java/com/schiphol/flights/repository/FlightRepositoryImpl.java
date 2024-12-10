@@ -12,7 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,19 +40,21 @@ public class FlightRepositoryImpl implements FlightRepositoryCustom {
                                         }
                                         return null;
                                     })
-                                    .must(m -> {
-                                        if (flightDirection != null) {
-                                            return m.term(t -> t.field("flightDirection").value(flightDirection.toString()));
-                                        }
-                                        return null;
-                                    })
-                                    .filter(f -> {
+                                          .must(m -> {
+                                                if (flightDirection != null) {
+                                                    return m.match(t -> t.field("flightDirection").query(flightDirection.getValue()));
+                                                }
+                                                return null;
+                                            })
+
+                                   .filter(f -> {
                                         if (startDateTime != null && endDateTime != null) {
                                             return f.range(r -> r
-                                                    .date(d -> d
+                                                    .number(d -> d
                                                             .field("scheduleDateTime")
-                                                            .gte(startDateTime.toString())
-                                                            .lte(endDateTime.toString())
+                                                            .gte((double)startDateTime.atZone(ZoneOffset.UTC).toInstant().toEpochMilli())
+                                                            .lte((double)endDateTime.atZone(ZoneOffset.UTC).toInstant().toEpochMilli())
+
                                                     )
                                             );
                                         }
@@ -70,11 +76,11 @@ public class FlightRepositoryImpl implements FlightRepositoryCustom {
                     Flight.class
             );
 
-            // Map hits to Flight objects
             List<Flight> flights = response.hits().hits()
                     .stream()
                     .map(Hit::source)
                     .toList();
+
 
             assert response.hits().total() != null;
             return new PaginatedResponse<>(
@@ -84,7 +90,7 @@ public class FlightRepositoryImpl implements FlightRepositoryCustom {
                     size
             );
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Error while querying Elasticsearch", e);
             throw new RuntimeException("Error querying Elasticsearch", e);
         }

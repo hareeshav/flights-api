@@ -53,10 +53,10 @@ public class FlightIntegrationTest {
                 "KLM",
                 "AMS",
                 "JFK",
-                LocalDateTime.now(),
+                System.currentTimeMillis(),
                 FlightDirection.DEPARTURE,
                 FlightStatus.SCHEDULED,
-                10
+                10,""
         );
 
         flightRepository.save(flight);
@@ -72,4 +72,5 @@ public class FlightIntegrationTest {
         boolean flightExists = flightRepository.findById("non-existent-id").isPresent();
         assertThat(flightExists).isFalse();
     }
+
 }
