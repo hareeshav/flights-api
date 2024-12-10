@@ -8,7 +8,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -24,7 +23,7 @@ public class AppConfig {
                                 "EK" + (i % 10),
                                 "ORI" + (i % 5),
                                 "AMS",
-                                System.currentTimeMillis(),
+                                System.currentTimeMillis(), // Convert timestamp to ISO 8601
                                 FlightDirection.ARRIVAL,
                                 FlightStatus.SCHEDULED,
                                 2,""

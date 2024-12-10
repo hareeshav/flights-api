@@ -19,15 +19,15 @@ public class FlightService {
 
     public PaginatedResponse<Flight> searchFlights(
             String destination,
-            String start,
-            String end,
+            LocalDateTime start,
+            LocalDateTime end,
             FlightDirection direction,
             int minDelay, int page, int size
     ) {
         return flightRepository.findFlights(
                 destination,
-                start != null ? LocalDateTime.parse(start) : LocalDateTime.parse("1970-01-01T00:00:00"),
-                end != null ? LocalDateTime.parse(end) : LocalDateTime.parse("9999-12-31T23:59:59"),
+                start != null ? start : LocalDateTime.parse("1970-01-01T00:00:00"),
+                end != null ? end : LocalDateTime.parse("9999-12-31T23:59:59"),
                 direction,
                 minDelay,
                 page, size
