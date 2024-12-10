@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
+import com.schiphol.flights.dto.FlightFilterResponse;
 import com.schiphol.flights.dto.PaginatedResponse;
 import com.schiphol.flights.model.Flight;
 import com.schiphol.flights.model.FlightDirection;
@@ -30,11 +31,11 @@ public class FlightRepositoryImplTest {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this); // Initialize mocks
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void findFlights_ReturnsFlights_WhenQuerySuccessful() throws Exception {
+    public void findFlightsReturnsFlightsWhenQuerySuccessful() throws Exception {
         // Prepare mock response
         Flight sampleFlight = new Flight(
                 "FL1",
@@ -79,7 +80,7 @@ public class FlightRepositoryImplTest {
         LocalDateTime startDateTime = LocalDateTime.of(2023, 12, 10, 0, 0);
         LocalDateTime endDateTime = LocalDateTime.of(2023, 12, 15, 0, 0);
 
-        PaginatedResponse<Flight> response = flightRepository.findFlights(
+        PaginatedResponse<FlightFilterResponse> response = flightRepository.findFlights(
                 "AMS",
                 startDateTime,
                 endDateTime,
@@ -95,7 +96,7 @@ public class FlightRepositoryImplTest {
     }
 
     @Test
-    public void findFlights_ReturnsEmpty_WhenNoResults() throws Exception {
+    public void findFlightsReturnsEmptyWhenNoResults() throws Exception {
         List<Hit<Flight>> hits = List.of();
 
         SearchResponse<Flight> searchResponse = SearchResponse.of(r -> r
@@ -121,7 +122,7 @@ public class FlightRepositoryImplTest {
         LocalDateTime startDateTime = LocalDateTime.of(2023, 12, 10, 0, 0);
         LocalDateTime endDateTime = LocalDateTime.of(2023, 12, 15, 0, 0);
 
-        PaginatedResponse<Flight> response = flightRepository.findFlights(
+        PaginatedResponse<FlightFilterResponse> response = flightRepository.findFlights(
                 "AMS",
                 startDateTime,
                 endDateTime,
@@ -137,7 +138,7 @@ public class FlightRepositoryImplTest {
     }
 
     @Test
-    public void findFlights_HandlesException_WhenElasticsearchFails() throws Exception {
+    public void findFlightsHandlesExceptionWhenElasticsearchFails() throws Exception {
         when(elasticsearchClient.search(
                 any(java.util.function.Function.class),
                 eq(Flight.class)
@@ -162,7 +163,7 @@ public class FlightRepositoryImplTest {
     }
 
     @Test
-    public void findFlights_WhenNoDestinationProvided() throws Exception {
+    public void findFlightsWhenNoDestinationProvided() throws Exception {
         List<Hit<Flight>> hits = List.of(
                 new Hit.Builder<Flight>()
                         .index("flights")
@@ -195,7 +196,7 @@ public class FlightRepositoryImplTest {
         LocalDateTime startDateTime = LocalDateTime.of(2023, 12, 10, 0, 0);
         LocalDateTime endDateTime = LocalDateTime.of(2023, 12, 15, 0, 0);
 
-        PaginatedResponse<Flight> response = flightRepository.findFlights(
+        PaginatedResponse<FlightFilterResponse> response = flightRepository.findFlights(
                 null,
                 startDateTime,
                 endDateTime,

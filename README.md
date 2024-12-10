@@ -28,5 +28,17 @@ To use this project, ensure you have the following installed:
 
 4. Run integration and unit tests with: `mvn test`.
 
+## Sample Request
+
+curl -X 'GET' \
+'http://localhost:8080/flights?destination=Ams&minDelayInMinutes=10&startScheduleDateTime=2024-12-09T12%3A28%3A49&endScheduleDateTime=2024-12-10T12%3A28%3A49&flightDirection=DEPARTURE&page=0&pageSize=0' \
+-H 'accept: */*'
+
+## Sample Response
+
+![Alt text for the image](./images/response.png)
+
 ## Future Improvements
 - Add authentication for the API.
+- Application Profiling
+- Setting up logger

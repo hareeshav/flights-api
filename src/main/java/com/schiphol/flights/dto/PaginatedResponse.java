@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaginatedResponse<T> {
-    private List<T> items;
+    private List<FlightFilterResponse> items;
     private long totalHits;
     private int currentPage;
     private int pageSize;

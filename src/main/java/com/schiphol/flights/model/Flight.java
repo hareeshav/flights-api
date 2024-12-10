@@ -1,6 +1,5 @@
 package com.schiphol.flights.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
@@ -12,10 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 @Data
 @NoArgsConstructor
@@ -60,9 +55,4 @@ public class Flight {
 
     @JsonIgnore
     private String _class;
-
-
-    public LocalDateTime getScheduleDateTimeAsLocalDateTime() {
-        return Instant.ofEpochMilli(scheduleDateTime).atZone(ZoneId.systemDefault()).toLocalDateTime();
-    }
 }

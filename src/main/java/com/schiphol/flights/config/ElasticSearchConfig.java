@@ -5,6 +5,7 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
@@ -29,8 +30,8 @@ public class ElasticSearchConfig {
     public ElasticsearchCustomConversions customConversions() {
         return new ElasticsearchCustomConversions(
                 List.of(
-                        new LocalDateTimeToLongConverter(),
-                        new LongToLocalDateTimeConverter()
+                        new LocalDateTimeToLongConverter()//,
+                        // new LongToLocalDateTimeConverter()
                 )
         );
     }
@@ -55,6 +56,11 @@ public class ElasticSearchConfig {
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
+        // Disable milliseconds in date/time formatting
+        objectMapper.disable(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
+        objectMapper.configOverride(LocalDateTime.class)
+                .setFormat(new com.fasterxml.jackson.annotation.JsonFormat.Value()
+                        .withPattern("yyyy-MM-dd'T'HH:mm:ss"));
         return objectMapper;
     }
 
