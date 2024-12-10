@@ -31,7 +31,7 @@ To use this project, ensure you have the following installed:
 ## Sample Request
 
 curl -X 'GET' \
-'http://localhost:8080/flights?destination=Ams&minDelayInMinutes=10&startScheduleDateTime=2024-12-09T12%3A28%3A49&endScheduleDateTime=2024-12-10T12%3A28%3A49&flightDirection=DEPARTURE&page=0&pageSize=0' \
+'http://localhost:8080/flights?destination=Ams&minDelayInMinutes=1&startScheduleDateTime=2024-12-09T13%3A42%3A58&endScheduleDateTime=2025-12-10T13%3A42%3A58&flightDirection=DEPARTURE&page=0&pageSize=10' \
 -H 'accept: */*'
 
 ## Sample Response
