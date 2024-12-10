@@ -7,6 +7,7 @@ import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,21 +18,19 @@ import org.springframework.data.elasticsearch.core.convert.ElasticsearchCustomCo
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
+@Slf4j
 @Configuration
 public class ElasticSearchConfig {
 
-    // Register custom conversions here
     @Bean
     public ElasticsearchCustomConversions customConversions() {
         return new ElasticsearchCustomConversions(
                 List.of(
                         new LocalDateTimeToLongConverter()//,
-                        // new LongToLocalDateTimeConverter()
                 )
         );
     }
@@ -44,19 +43,11 @@ public class ElasticSearchConfig {
         }
     }
 
-    // Converter to transform Long (epoch milliseconds) to LocalDateTime
-    public static class LongToLocalDateTimeConverter implements Converter<Long, LocalDateTime> {
-        @Override
-        public LocalDateTime convert(Long source) {
-            return Instant.ofEpochMilli(source).atZone(ZoneOffset.UTC).toLocalDateTime();
-        }
-    }
 
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        // Disable milliseconds in date/time formatting
         objectMapper.disable(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
         objectMapper.configOverride(LocalDateTime.class)
                 .setFormat(new com.fasterxml.jackson.annotation.JsonFormat.Value()
@@ -67,7 +58,6 @@ public class ElasticSearchConfig {
     @Bean
     public ElasticsearchClient elasticsearchClient(@Value("${spring.elasticsearch.rest.uris}") String elasticsearchUrl, ObjectMapper objectMapper) {
         try {
-            // Parse the mapped port URL properly
             URI uri = new URI(elasticsearchUrl);
             RestClient restClient = RestClient.builder(
                     new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())
@@ -80,6 +70,7 @@ public class ElasticSearchConfig {
 
             return new ElasticsearchClient(transport);
         } catch (URISyntaxException e) {
+            log.error(e.getMessage(), e);
             throw new RuntimeException("Error parsing Elasticsearch URL", e);
         }
     }

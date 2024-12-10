@@ -1,5 +1,6 @@
 package com.schiphol.flights.exception;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
 
-        // Loop through the field errors and map them into user-friendly error responses
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.put(error.getField(), getValidationErrorMessage(error));
         }
@@ -37,11 +37,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         Map<String, String> errorResponse = new HashMap<>();
 
-        if (ex.getCause() instanceof InvalidFormatException) {
-            InvalidFormatException invalidFormatException = (InvalidFormatException) ex.getCause();
+        if (ex.getCause() instanceof InvalidFormatException invalidFormatException) {
 
             String path = invalidFormatException.getPath().stream()
-                    .map(ref -> ref.getFieldName())
+                    .map(JsonMappingException.Reference::getFieldName)
                     .reduce((f1, f2) -> f2) // Extract field name
                     .orElse("");
 
