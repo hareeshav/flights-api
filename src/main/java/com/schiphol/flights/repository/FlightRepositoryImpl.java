@@ -2,7 +2,6 @@ package com.schiphol.flights.repository;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.json.JsonData;
 import com.schiphol.flights.dto.PaginatedResponse;
 import com.schiphol.flights.model.Flight;
 import com.schiphol.flights.model.FlightDirection;
@@ -11,14 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 public class FlightRepositoryImpl implements FlightRepositoryCustom {
