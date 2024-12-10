@@ -1,10 +1,9 @@
 package com.schiphol.flights.repository;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.util.ObjectBuilder;
+import co.elastic.clients.json.JsonData;
+import com.schiphol.flights.dto.PaginatedResponse;
 import com.schiphol.flights.model.Flight;
 import com.schiphol.flights.model.FlightDirection;
 import org.slf4j.Logger;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
@@ -25,34 +23,70 @@ public class FlightRepositoryImpl implements FlightRepositoryCustom {
     @Autowired
     private ElasticsearchClient elasticsearchClient;
 
+
     @Override
-    public List<Flight> findFlights(String destination, LocalDateTime startDateTime, LocalDateTime endDateTime, FlightDirection flightDirection, int minDelayInMinutes) {
-        try{
-        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-        if(null != destination) {
-            boolQueryBuilder.must(b-> b.term(t-> t.field("destination").value(destination)));
-        }
-        if(flightDirection != null) {
-            boolQueryBuilder.must(b -> b.term(t -> t.field("flightDirection").value(flightDirection.toString())));
-        }
-        // Execute the search
-        SearchResponse<Flight> searchResponse  = elasticsearchClient.search(
+    public PaginatedResponse<Flight> findFlights(String destination, LocalDateTime startDateTime, LocalDateTime endDateTime, FlightDirection flightDirection, int minDelayInMinutes, int page, int size) {
+        try {
+            var response = elasticsearchClient.search(
                     s -> s.index("flights")
-                            .query(q -> q.bool((Function<BoolQuery.Builder, ObjectBuilder<BoolQuery>>) boolQueryBuilder))
-                            .size(100),
+                            .query(q -> q.bool(b -> b
+                                    .must(m -> {
+                                        if (destination != null) {
+                                            return m.match(mt -> mt.field("destination").query(destination));
+                                        }
+                                        return null;
+                                    })
+                                    .must(m -> {
+                                        if (flightDirection != null) {
+                                            return m.term(t -> t.field("flightDirection").value(flightDirection.toString()));
+                                        }
+                                        return null;
+                                    })
+                                    .filter(f -> {
+                                        if (startDateTime != null && endDateTime != null) {
+                                            return f.range(r -> r
+                                                    .date(d -> d
+                                                            .field("scheduleDateTime")
+                                                            .gte(startDateTime.toString())
+                                                            .lte(endDateTime.toString())
+                                                    )
+                                            );
+                                        }
+                                        return null;
+                                    })
+                                    .filter(f -> {
+                                        if (minDelayInMinutes > 0) {
+                                            return f.range(r -> r
+                                                    .number(n -> n
+                                                            .field("delayInMinutes")
+                                                            .gte((double)minDelayInMinutes))
+                                            );
+                                        }
+                                        return null;
+                                    })
+                            ))
+                            .from(page * size)
+                            .size(size),
                     Flight.class
             );
 
+            // Map hits to Flight objects
+            List<Flight> flights = response.hits().hits()
+                    .stream()
+                    .map(Hit::source)
+                    .toList();
 
-        // Map search hits to Flight objects
-        return searchResponse.hits().hits()
-                .stream()
-                .map(Hit::source)
-                .collect(Collectors.toList());
+            assert response.hits().total() != null;
+            return new PaginatedResponse<>(
+                    flights,
+                    response.hits().total().value(), // Total hits in Elasticsearch
+                    page,
+                    size
+            );
 
         } catch (IOException e) {
-            log.error("Error while querying Elastic Search", e);
-            throw new RuntimeException(e);
+            log.error("Error while querying Elasticsearch", e);
+            throw new RuntimeException("Error querying Elasticsearch", e);
         }
     }
 }

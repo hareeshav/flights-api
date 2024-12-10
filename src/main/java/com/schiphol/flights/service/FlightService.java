@@ -1,5 +1,6 @@
 package com.schiphol.flights.service;
 
+import com.schiphol.flights.dto.PaginatedResponse;
 import com.schiphol.flights.model.Flight;
 import com.schiphol.flights.model.FlightDirection;
 import com.schiphol.flights.repository.FlightRepositoryCustom;
@@ -17,19 +18,20 @@ public class FlightService {
         this.flightRepository = flightRepository;
     }
 
-    public List<Flight> searchFlights(
+    public PaginatedResponse<Flight> searchFlights(
             String destination,
             LocalDateTime start,
             LocalDateTime end,
             FlightDirection direction,
-            int minDelay
+            int minDelay, int page, int size
     ) {
         return flightRepository.findFlights(
                 destination,
                 start != null ? start : LocalDateTime.parse("1970-01-01T00:00:00"),
                 end != null ? end : LocalDateTime.parse("9999-12-31T23:59:59"),
                 direction,
-                minDelay
+                minDelay,
+                page, size
         );
     }
 }
